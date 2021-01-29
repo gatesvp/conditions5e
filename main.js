@@ -28,7 +28,7 @@ CONFIG.statusEffects = [
   "modules/conditions5e/icons/diseased.svg",
   "modules/conditions5e/icons/exhaustion5.svg"
 ];
-  
+
 // Condition Types
 CONFIG.conditionTypes = {
   "blinded": "Blinded",
@@ -61,29 +61,29 @@ CONFIG.controlIcons.visibility = "modules/conditions5e/icons/invisible.svg";
 CONFIG.controlIcons.defeated = "modules/conditions5e/icons/dead.svg";
 
 // Patch CombatTracker to work with token HUD overlay
-Hooks.once("ready", function() {
+Hooks.once("ready", function () {
   let newClass = CombatTracker;
   newClass = trPatchLib.patchMethod(newClass, "_onCombatantControl", 21,
-    `if ( isDefeated && !token.data.overlayEffect ) token.toggleOverlay(CONFIG.controlIcons.defeated);`,
-    `if ( isDefeated && token.data.overlayEffect !== CONFIG.controlIcons.defeated ) token.toggleOverlay(CONFIG.controlIcons.defeated);`);
+    `if ( isDefeated && !token.data.overlayEffect ) token.toggleEffect(CONFIG.controlIcons.defeated, {overlay: true});`,
+    `if ( isDefeated && token.data.overlayEffect !== CONFIG.controlIcons.defeated ) token.toggleEffect(CONFIG.controlIcons.defeated, {overlay:true});`);
   if (!newClass) return;
   CombatTracker.prototype._onCombatantControl = newClass.prototype._onCombatantControl;
 });
 
 // Function to use token overlay to show status as wounded, unconscious, or dead
-Token.prototype._updateHealthOverlay = function(tok) {
+Token.prototype._updateHealthOverlay = function (tok) {
   let maxHP = tok.actor.data.data.attributes.hp.max;
   let curHP = tok.actor.data.data.attributes.hp.value;
   let priorHealth = tok.data.overlayEffect;
   let newHealth = null;
-  if ( curHP <= 0 ) {
-    if ( priorHealth === "modules/conditions5e/icons/dead.svg" ) newHealth = priorHealth;
+  if (curHP <= 0) {
+    if (priorHealth === "modules/conditions5e/icons/dead.svg") newHealth = priorHealth;
     else newHealth = "modules/conditions5e/icons/almostdead.svg";
   }
-  else if ( curHP / maxHP < 0.5 ) newHealth = "modules/conditions5e/icons/wounded.svg";
-  if ( newHealth !== priorHealth ) {
-    if ( newHealth === null ) tok.toggleOverlay(priorHealth);
-    else tok.toggleOverlay(newHealth);
+  else if (curHP / maxHP < 0.5) newHealth = "modules/conditions5e/icons/wounded.svg";
+  if (newHealth !== priorHealth) {
+    if (newHealth === null) tok.toggleEffect(priorHealth, { overlay: true });
+    else tok.toggleEffect(newHealth, { overlay: true });
   }
 };
 
